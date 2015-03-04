@@ -5,17 +5,45 @@
  */
 package apcs.gameofsticks.core;
 
+import java.io.IOException;
+import java.net.ServerSocket;
+
 /**
  *
  * @author mhrcek
  */
 public class Boot {
 
+    private final int PORT = 404;
+    
+    Lobby lobby;
+    MatchMaker matchMaker;
+    ServerSocket server;
+    
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
-        // TODO code application logic here
+    public static void main(String[] args) throws IOException{
+        
+        Boot b = new Boot();
+        b.run();
+        
+        while(true){
+            
+        }
+        
+    }
+    
+    public void run() throws IOException{
+        server = new ServerSocket(PORT);
+        
+        lobby = new Lobby();
+        Thread lobbyThread = new Thread(lobby);
+        lobbyThread.start();
+        
+        matchMaker = new MatchMaker();
+        Thread matchMakerThread = new Thread(matchMaker);
+        matchMakerThread.start();
     }
     
 }
