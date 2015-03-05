@@ -16,6 +16,7 @@ public class Client implements Runnable {
 
     private Socket socket;
     private volatile ClientIO clientIO;
+    private volatile Match match;
 
     public Client(Socket socket) {
         this.socket = socket;
@@ -27,6 +28,10 @@ public class Client implements Runnable {
         }
     }
 
+    private synchronized void joinMatch(Match match){
+        this.match = match;
+    }
+    
     public Socket getClientSocket() {
         return socket;
     }
