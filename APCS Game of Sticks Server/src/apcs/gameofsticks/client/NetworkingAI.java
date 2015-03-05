@@ -19,7 +19,10 @@ public abstract class NetworkingAI implements Runnable{
     
     private Socket socket;
     
-    private volatile boolean isInGame;
+    private volatile boolean matchStillActive;
+    private volatile int maxSticksTaken;
+    private volatile int sticksRemaining;
+    private volatile boolean hasWonMatch;
     
     public NetworkingAI(String host){
         this.host = host;
@@ -36,21 +39,37 @@ public abstract class NetworkingAI implements Runnable{
         }
         
     }
-    
-    public int requestMaxSticksTaken(){
-        return -1;
+    /**
+     * Get the max number of sticks you may take.
+     * @return Maximum number of sticks that may be taken.
+     */
+    public synchronized int getMaxSticksTaken(){
+        return maxSticksTaken;
     }
     
-    public int requestSticksRemaining(){
-        return -1;
+    /**
+     * Get the number of sticks remaining.
+     * @return Number of sticks the server has.
+     */
+    public synchronized int getSticksRemaining(){
+        return sticksRemaining;
     }
     
-    public boolean takeSticks(int numSticks){
+    /**
+     * Take some sticks from the server.
+     * @param numSticks Number of sticks to take.
+     * @return If the sticks could be taken.
+     */
+    public synchronized boolean takeSticks(int numSticks){
         return false;
     }
     
-    public boolean wonGame(){
-        return false;
+    /**
+     * Determines if the player won the game.
+     * @return If the player has won.
+     */
+    public synchronized boolean wonMatch(){
+        return hasWonMatch;
     }
     
     /**
@@ -63,5 +82,42 @@ public abstract class NetworkingAI implements Runnable{
      * AI game playing logic goes here.
      */
     public abstract void playGame();
+    
+    /**
+     * Main loop
+     */
+    @Override
+    public void run(){
+        while(true){
+            waitForMatch();
+            requestMatchData();
+            while(requestIsMatchStillActive()){
+                requestMatchDataUpdate();
+                playGame();
+            }
+            requestHasWonMatch();
+            gameOver();
+        }
+    }
+    
+    private synchronized void requestHasWonMatch(){
+        
+    }
+    
+    private synchronized void waitForMatch(){
+        
+    }
+    
+    private synchronized void requestMatchData(){
+        
+    }
+    
+    private synchronized void requestMatchDataUpdate(){
+        
+    }
+    
+    private synchronized boolean requestIsMatchStillActive(){
+        return false;
+    }
     
 }
