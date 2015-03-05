@@ -7,6 +7,7 @@ package apcs.gameofsticks.core;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 
 /**
  *
@@ -14,36 +15,55 @@ import java.net.ServerSocket;
  */
 public class Boot {
 
-    private final int PORT = 404;
-    
+    private final int PORT = 80;
+
     Lobby lobby;
     MatchMaker matchMaker;
     ServerSocket server;
-    
+
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws IOException{
-        
+    public static void main(String[] args) {
+
         Boot b = new Boot();
         b.run();
-        
-        while(true){
+
+    }
+
+    public void run() {
+        try {
+            server = new ServerSocket(PORT);
+
+            lobby = new Lobby();
+            Thread lobbyThread = new Thread(lobby);
+            lobbyThread.start();
+
+            matchMaker = new MatchMaker();
+            Thread matchMakerThread = new Thread(matchMaker);
+            matchMakerThread.start();
+
+            System.out.println("Server started!");
+            System.out.println("Waiting for clients...");
             
+            while (true) {
+
+                Socket socket = server.accept();
+                Client client = new Client(socket);
+
+                synchronized (this) {
+                    lobby.addToLobby(client);
+                }
+                Thread clientThread = new Thread(client);
+                clientThread.start();
+                
+                System.out.println("Client added to lobby (" + socket.getInetAddress() + ")");
+
+            }
+        } catch (IOException e) {
+            System.err.println("An error has occured.");
+            e.printStackTrace();
         }
-        
     }
-    
-    public void run() throws IOException{
-        server = new ServerSocket(PORT);
-        
-        lobby = new Lobby();
-        Thread lobbyThread = new Thread(lobby);
-        lobbyThread.start();
-        
-        matchMaker = new MatchMaker();
-        Thread matchMakerThread = new Thread(matchMaker);
-        matchMakerThread.start();
-    }
-    
+
 }

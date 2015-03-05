@@ -5,10 +5,35 @@
  */
 package apcs.gameofsticks.core;
 
+import java.io.IOException;
+import java.net.Socket;
+
 /**
  *
  * @author mhrcek
  */
-public class Client {
-    
+public class Client implements Runnable {
+
+    private Socket socket;
+    private volatile ClientIO clientIO;
+
+    public Client(Socket socket) {
+        this.socket = socket;
+
+        try {
+            clientIO = new ClientIO(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Socket getClientSocket() {
+        return socket;
+    }
+
+    @Override
+    public void run() {
+
+    }
+
 }
