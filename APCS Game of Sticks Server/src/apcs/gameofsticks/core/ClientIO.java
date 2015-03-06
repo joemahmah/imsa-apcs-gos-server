@@ -16,8 +16,8 @@ import java.util.Scanner;
 public class ClientIO {
     
     private Client client;
-    private Scanner in;
-    private PrintWriter out;
+    private volatile Scanner in;
+    private volatile PrintWriter out;
     
     public ClientIO(Client client) throws IOException{
         this.client = client;
@@ -26,5 +26,7 @@ public class ClientIO {
         out = new PrintWriter(client.getClientSocket().getOutputStream());
         
     }
+    
+    
     
 }
