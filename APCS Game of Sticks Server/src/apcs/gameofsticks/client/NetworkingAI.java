@@ -24,6 +24,10 @@ public abstract class NetworkingAI implements Runnable{
     private volatile int sticksRemaining;
     private volatile boolean hasWonMatch;
     
+    /**
+     * 
+     * @param host The ip of the server.
+     */
     public NetworkingAI(String host){
         this.host = host;
     }

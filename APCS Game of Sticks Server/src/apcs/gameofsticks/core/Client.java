@@ -14,12 +14,16 @@ import java.net.Socket;
  */
 public class Client implements Runnable {
 
+    private String id; //User's id will be their IP
+    
     private Socket socket;
     private volatile ClientIO clientIO;
     private volatile Match match;
 
     public Client(Socket socket) {
         this.socket = socket;
+        
+        id = socket.getInetAddress() + "";
 
         try {
             clientIO = new ClientIO(this);

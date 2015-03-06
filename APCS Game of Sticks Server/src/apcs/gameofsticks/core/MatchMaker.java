@@ -5,12 +5,21 @@
  */
 package apcs.gameofsticks.core;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author mhrcek
  */
 public class MatchMaker implements Runnable{
 
+    List<Match> matchesInProgress;
+    
+    public MatchMaker(){
+        matchesInProgress = new ArrayList<>();
+    }
+    
     @Override
     public void run() {
         
