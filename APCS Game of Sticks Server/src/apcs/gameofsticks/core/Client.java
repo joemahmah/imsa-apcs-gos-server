@@ -125,7 +125,7 @@ public class Client implements Runnable {
     }
 
     public synchronized void getWinner(){
-        if(match != null){
+        if(match != null && !match.isMatchStillActive()){
             
         }
     }

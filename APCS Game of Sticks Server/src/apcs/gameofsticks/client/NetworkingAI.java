@@ -24,12 +24,17 @@ public abstract class NetworkingAI implements Runnable {
     private volatile int sticksRemaining;
     private volatile boolean hasWonMatch;
 
+    private volatile boolean isTurn;
+    private volatile boolean inMatch;
+
     /**
      *
      * @param host The ip of the server.
      */
     public NetworkingAI(String host) {
         this.host = host;
+        this.isTurn = false;
+        this.inMatch = false;
     }
 
     private void connectToServer() {
@@ -114,13 +119,31 @@ public abstract class NetworkingAI implements Runnable {
 
     private synchronized void waitForTurn() {
 
+        synchronized (this) {
+            while (!isTurn) {
+
+            }
+
+            isTurn = false;
+        }
+
     }
 
     private synchronized void requestHasWonMatch() {
 
+        synchronized (this) {
+            inMatch = false;
+        }
+
     }
 
     private synchronized void waitForMatch() {
+
+        synchronized (this) {
+            while (!inMatch) {
+
+            }
+        }
 
     }
 

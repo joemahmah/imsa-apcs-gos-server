@@ -52,6 +52,10 @@ public class Match extends Thread {
         return maxSticksToTake;
     }
     
+    public synchronized boolean isWinner(Client c){
+        return c == winningClient;
+    }
+    
     @Override
     public void run() {
 
