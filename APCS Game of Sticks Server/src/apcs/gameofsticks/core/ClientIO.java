@@ -78,8 +78,13 @@ public class ClientIO {
                 }
 
                 int num = Integer.parseInt(number);
-
-                client.takeSticks(num);
+                
+                if(num > 0 && num <= client.getMatch().getMaxSticksToTake()){
+                    client.takeSticks(num);
+                    write("STICK_GOOD");
+                } else{
+                    write("STICK_BAD");
+                }
             }
         }
     }

@@ -61,6 +61,10 @@ public class Client implements Runnable {
         this.match = match;
     }
 
+    public Match getMatch(){
+        return match;
+    }
+    
     /**
      * Gets the client's socket.
      *
