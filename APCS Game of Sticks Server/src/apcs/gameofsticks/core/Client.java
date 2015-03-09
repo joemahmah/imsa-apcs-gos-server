@@ -92,5 +92,9 @@ public class Client implements Runnable {
             
         }
     }
+    
+    public synchronized int requestSticksToBeTaken(){
+        
+    }
 
 }
