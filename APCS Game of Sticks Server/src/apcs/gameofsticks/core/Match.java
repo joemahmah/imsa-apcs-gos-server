@@ -32,6 +32,23 @@ public class Match extends Thread {
         }
     }
 
+    public synchronized boolean isMatchStillActive(){
+        return sticksRemaining != 0;
+    }
+    
+    public synchronized int getSticksRemaining(){
+        return sticksRemaining;
+    }
+    
+    public synchronized int getTotalSticks(){
+        return totalSticks;
+    }
+    
+    public synchronized int getMaxSticksToTake(){
+        return maxSticksToTake;
+    }
+    
+    @Override
     public void run() {
 
         synchronized (this) {
@@ -56,7 +73,7 @@ public class Match extends Thread {
     }
 
     private synchronized void winner(Client c) {
-
+        winningClient = c;
     }
 
     /*

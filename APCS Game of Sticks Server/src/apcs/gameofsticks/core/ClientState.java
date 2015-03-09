@@ -13,7 +13,9 @@ public enum ClientState {
     
     lobby,
     pregame,
-    game,
+    game_turn,
+    game_waiting,
+    game_needsAnswer,
     postgame;
     
 }
