@@ -124,6 +124,24 @@ public class Client implements Runnable {
         }
     }
 
+    public synchronized void getWinner(){
+        if(match != null){
+            
+        }
+    }
+    
+    public synchronized void getSticksRemaining(){
+        if(match != null){
+            clientIO.write(match.getSticksRemaining()+"");
+        }
+    }
+    
+    public synchronized void getMaxSticks(){
+        if(match != null){
+            clientIO.write(match.getMaxSticksToTake()+"");
+        }
+    }
+    
     public synchronized void takeSticks(int num) {
         sticksTaken = num;
     }
@@ -133,7 +151,7 @@ public class Client implements Runnable {
             try {
                 clientIO.write("terminated");
                 if (match != null) {
-                    match.end(this);
+                    match.terminate(this);
                 }
                 match = null;
                 socket.close();

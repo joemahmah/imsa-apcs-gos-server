@@ -23,12 +23,15 @@ public class Match extends Thread {
     private volatile int sticksRemaining;
     private volatile int maxSticksToTake;
 
-    public Match(int totalSticks, int maxSticksToTake) {
+    private volatile Lobby lobby;
+    
+    public Match(Lobby lobby, int totalSticks, int maxSticksToTake) {
         synchronized (this) {
             this.totalSticks = totalSticks;
             this.sticksRemaining = totalSticks;
             this.maxSticksToTake = maxSticksToTake;
             this.matchID = matchID++;
+            this.lobby = lobby;
             this.start();
         }
     }
@@ -84,6 +87,16 @@ public class Match extends Thread {
 
     private synchronized void winner(Client c) {
         winningClient = c;
+    }
+    
+    public synchronized void terminate(Client c){
+        if(c == player1){
+            lobby.addToLobby(player2);
+        } else{
+            lobby.addToLobby(player1);
+        }
+        
+        //kill THIS!!!!
     }
 
     /*
