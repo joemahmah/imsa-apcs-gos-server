@@ -144,7 +144,7 @@ public abstract class NetworkingAI implements Runnable {
 
         synchronized (this) {
             hasWonMatch = false;
-            
+
             while (!inMatch) {
 
             }
@@ -181,6 +181,7 @@ public abstract class NetworkingAI implements Runnable {
 
             in = new Scanner(socket.getInputStream());
             out = new PrintWriter(socket.getOutputStream());
+            this.start();
 
         }
 
@@ -188,6 +189,15 @@ public abstract class NetworkingAI implements Runnable {
             synchronized (this) {
                 if (in.hasNextLine()) {
                     parseCommand(in.nextLine());
+                }
+            }
+        }
+
+        @Override
+        public void run() {
+            synchronized (this) {
+                while (true) {
+                    listen();
                 }
             }
         }
@@ -263,8 +273,8 @@ public abstract class NetworkingAI implements Runnable {
                 if (command.contains("isTurn")) {
                     isTurn = true;
                 }
-                
-                if (command.contains("isWinner")){
+
+                if (command.contains("isWinner")) {
                     if (command.contains("true")) {
                         hasWonMatch = true;
                     } else {

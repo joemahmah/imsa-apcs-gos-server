@@ -13,7 +13,7 @@ import java.util.Scanner;
  *
  * @author mhrcek
  */
-public class ClientIO {
+public class ClientIO extends Thread {
 
     private Client client;
     private volatile Scanner in;
@@ -25,12 +25,22 @@ public class ClientIO {
         in = new Scanner(client.getClientSocket().getInputStream());
         out = new PrintWriter(client.getClientSocket().getOutputStream());
 
+        this.start();
     }
 
     public synchronized void listen() {
         synchronized (this) {
             if (in.hasNextLine()) {
                 parseCommand(in.nextLine());
+            }
+        }
+    }
+
+    @Override
+    public void run() {
+        synchronized (this) {
+            while (true) {
+                listen();
             }
         }
     }
@@ -64,7 +74,7 @@ public class ClientIO {
             if (command.contains("terminate")) {
                 client.terminate();
             }
-            
+
             if (command.contains("request turn")) {
                 client.isTurn();
             }
@@ -78,11 +88,11 @@ public class ClientIO {
                 }
 
                 int num = Integer.parseInt(number);
-                
-                if(num > 0 && num <= client.getMatch().getMaxSticksToTake()){
+
+                if (num > 0 && num <= client.getMatch().getMaxSticksToTake()) {
                     client.takeSticks(num);
                     write("STICK_GOOD");
-                } else{
+                } else {
                     write("STICK_BAD");
                 }
             }
