@@ -34,20 +34,21 @@ public class MatchMaker implements Runnable {
                 try {
                     List<Client> clientsReady = lobby.getClientsFlaggedAsReady();
 
-                    int target1 = rand.nextInt(clientsReady.size());
-                    Client client1 = clientsReady.get(target1);
-                    clientsReady.remove(client1);
-                    lobby.removeClient(client1);
+                    if (clientsReady.size() > 1) {
+                        int target1 = rand.nextInt(clientsReady.size());
+                        Client client1 = clientsReady.get(target1);
+                        clientsReady.remove(client1);
+                        lobby.removeClient(client1);
 
-                    int target2 = rand.nextInt(clientsReady.size());
-                    Client client2 = clientsReady.get(target2);
-                    clientsReady.remove(client2);
-                    lobby.removeClient(client2);
-                    
-                    Match match = new Match(lobby, 20, 3, client1, client2);
-                    client1.joinMatch(match);
-                    client2.joinMatch(match);
-                    
+                        int target2 = rand.nextInt(clientsReady.size());
+                        Client client2 = clientsReady.get(target2);
+                        clientsReady.remove(client2);
+                        lobby.removeClient(client2);
+
+                        Match match = new Match(lobby, 20, 3, client1, client2);
+                        client1.joinMatch(match);
+                        client2.joinMatch(match);
+                    }
                 } catch (Exception ex) {
                     Logger.getLogger(MatchMaker.class.getName()).log(Level.SEVERE, null, ex);
                 }

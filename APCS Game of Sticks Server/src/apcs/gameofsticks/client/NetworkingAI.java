@@ -5,7 +5,6 @@
  */
 package apcs.gameofsticks.client;
 
-import apcs.gameofsticks.core.Client;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -38,6 +37,8 @@ public abstract class NetworkingAI implements Runnable {
         this.host = host;
         this.isTurn = false;
         this.inMatch = false;
+        
+        connectToServer();
     }
 
     private void connectToServer() {
@@ -46,6 +47,7 @@ public abstract class NetworkingAI implements Runnable {
             socket = new Socket(host, PORT);
 
             Thread t = new Thread(this);
+            t.start();
         } catch (IOException e) {
             System.err.println("Unable to connect to server!");
         }
