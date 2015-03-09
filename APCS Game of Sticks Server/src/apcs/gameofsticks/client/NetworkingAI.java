@@ -96,12 +96,17 @@ public abstract class NetworkingAI implements Runnable{
             waitForMatch();
             requestMatchData();
             while(requestIsMatchStillActive()){
+                waitForTurn();
                 requestMatchDataUpdate();
                 playGame();
             }
             requestHasWonMatch();
             gameOver();
         }
+    }
+    
+    private synchronized void waitForTurn(){
+        
     }
     
     private synchronized void requestHasWonMatch(){

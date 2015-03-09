@@ -7,6 +7,8 @@ package apcs.gameofsticks.core;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This is the server-side representation of a player. Clients run on their own
@@ -26,6 +28,8 @@ public class Client implements Runnable {
 
     private volatile ClientState state;
 
+    private int sticksTaken;
+
     /**
      * The constructor for the client.
      *
@@ -44,6 +48,8 @@ public class Client implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        sticksTaken = -404;
     }
 
     /**
@@ -97,10 +103,46 @@ public class Client implements Runnable {
         }
     }
 
-    public synchronized int sendRequestSticksToBeTaken(int i) {
+    public synchronized int getSticksTaken() {
+        synchronized (this) {
+            while (sticksTaken <= 0) {
 
-        //send to match
-        
+            }
+            return sticksTaken;
+        }
+    }
+
+    public synchronized void clearSticksTaken() {
+        sticksTaken = -404;
+    }
+
+    public synchronized void isTurn() {
+        synchronized (this) {
+            if (match != null) {
+                clientIO.write(match.isClientTurn(this) + "");
+            }
+        }
+    }
+
+    public synchronized void takeSticks(int num) {
+        sticksTaken = num;
+    }
+
+    public synchronized void terminate() {
+        synchronized (this) {
+            try {
+                clientIO.write("terminated");
+                if (match != null) {
+                    match.end(this);
+                }
+                match = null;
+                socket.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            } finally {
+                System.out.println("Client " + id + " has been disconnected!");
+            }
+        }
     }
 
 }

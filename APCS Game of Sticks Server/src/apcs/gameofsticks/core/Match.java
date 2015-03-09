@@ -17,6 +17,7 @@ public class Match extends Thread {
     private volatile Client player1;
     private volatile Client player2;
     private volatile Client winningClient;
+    private volatile Client activeClient;
 
     private volatile int totalSticks;
     private volatile int sticksRemaining;
@@ -53,8 +54,10 @@ public class Match extends Thread {
 
         synchronized (this) {
             while (sticksRemaining != 0) {
+                activeClient = player1;
                 takeSticks(player1);
                 if (sticksRemaining != 0) {
+                    activeClient = player2;
                     takeSticks(player2);
                     if (sticksRemaining == 0) {
                         winner(player1);
@@ -69,7 +72,14 @@ public class Match extends Thread {
     }
 
     private synchronized void takeSticks(Client c) {
-
+        synchronized(this){
+            c.getSticksTaken();
+            c.clearSticksTaken();
+        }
+    }
+    
+    public synchronized boolean isClientTurn(Client c){
+        return c == activeClient;
     }
 
     private synchronized void winner(Client c) {
