@@ -25,13 +25,15 @@ public class Match extends Thread {
 
     private volatile Lobby lobby;
     
-    public Match(Lobby lobby, int totalSticks, int maxSticksToTake) {
+    public Match(Lobby lobby, int totalSticks, int maxSticksToTake, Client player1, Client player2) {
         synchronized (this) {
             this.totalSticks = totalSticks;
             this.sticksRemaining = totalSticks;
             this.maxSticksToTake = maxSticksToTake;
             this.matchID = matchID++;
             this.lobby = lobby;
+            this.player1 = player1;
+            this.player2 = player2;
             this.start();
         }
     }

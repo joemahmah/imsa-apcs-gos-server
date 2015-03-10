@@ -57,7 +57,7 @@ public class Client implements Runnable {
      *
      * @param match Match to join.
      */
-    private synchronized void joinMatch(Match match) {
+    public synchronized void joinMatch(Match match) {
         this.match = match;
     }
 

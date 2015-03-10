@@ -39,7 +39,7 @@ public class Boot {
             Thread lobbyThread = new Thread(lobby);
             lobbyThread.start();
 
-            matchMaker = new MatchMaker();
+            matchMaker = new MatchMaker(lobby);
             Thread matchMakerThread = new Thread(matchMaker);
             matchMakerThread.start();
 
