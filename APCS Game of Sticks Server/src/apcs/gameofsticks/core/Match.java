@@ -66,10 +66,12 @@ public class Match extends Thread {
         synchronized (this) {
 
             while (sticksRemaining != 0) {
-                System.out.println(matchID + "- " + ++round);
+                System.out.println("Match " + matchID + ": Round " + ++round);
+                System.out.println("Match " + matchID + ": Player 1 Active");
                 activeClient = player1;
                 takeSticks(player1);
                 if (sticksRemaining != 0) {
+                    System.out.println("Match " + matchID + ": Player 2 Active");
                     activeClient = player2;
                     takeSticks(player2);
                     if (sticksRemaining == 0) {

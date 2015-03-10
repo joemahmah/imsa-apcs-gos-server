@@ -123,7 +123,7 @@ public class Client implements Runnable {
     public synchronized int getSticksTaken() {
         synchronized (this) {
             while (sticksTaken <= 0) {
-
+                
             }
             return sticksTaken;
         }

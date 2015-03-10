@@ -51,6 +51,8 @@ public class MatchMaker implements Runnable {
                         
                         System.out.println("Match made (" + match.getMatchID() + "): " + client1 + " v. " + client2);
                     }
+                    
+                    Thread.sleep(100);
                 } catch (Exception ex) {
                     Logger.getLogger(MatchMaker.class.getName()).log(Level.SEVERE, null, ex);
                 }

@@ -50,6 +50,7 @@ public class ClientIO extends Thread {
         synchronized (this) {
             while (true) {
                 listen();
+                System.out.println("Listen");
             }
         }
     }
@@ -68,6 +69,8 @@ public class ClientIO extends Thread {
     private void parseCommand(String command) {
         synchronized (this) {
 
+            System.out.println("Message " + command + " recieved.");
+            
             if (command.contains("request maxStick")) {
                 client.getMaxSticks();
             }
@@ -97,7 +100,7 @@ public class ClientIO extends Thread {
                 }
 
                 int num = Integer.parseInt(number);
-
+                
                 if (num > 0 && num <= client.getMatch().getMaxSticksToTake()) {
                     client.takeSticks(num);
                     write("STICK_GOOD");
