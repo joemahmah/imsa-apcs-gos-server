@@ -34,6 +34,8 @@ public abstract class NetworkingAI implements Runnable {
     private volatile boolean inMatch;
 
     private NetworkIOManager networkIOManager;
+    
+    private volatile String replyTakeSticks = null;
 
     /**
      *
@@ -90,7 +92,20 @@ public abstract class NetworkingAI implements Runnable {
      * @return If the sticks could be taken.
      */
     public synchronized boolean takeSticks(int numSticks) {
-        return false;
+        networkIOManager.write("take stick " + numSticks);
+
+        while (replyTakeSticks == null) {
+
+        }
+
+        if (replyTakeSticks.contains("GOOD")) {
+            replyTakeSticks = null;
+            return true;
+        } else {
+
+            replyTakeSticks = null;
+            return false;
+        }
     }
 
     /**
@@ -127,7 +142,6 @@ public abstract class NetworkingAI implements Runnable {
                     while (requestIsMatchStillActive()) {
                         waitForTurn();
                         requestMatchDataUpdate();
-                        System.out.println("Play");
                         playGame();
                     }
                     requestHasWonMatch();
@@ -142,7 +156,7 @@ public abstract class NetworkingAI implements Runnable {
     private synchronized void waitForTurn() {
 
         System.out.println("Waiting for turn...");
-        
+
         synchronized (this) {
             while (!isTurn) {
 
@@ -169,7 +183,7 @@ public abstract class NetworkingAI implements Runnable {
             while (!inMatch) {
 
             }
-            
+
             System.out.println("Joined Match!");
             matchStillActive = true;
         }
@@ -191,13 +205,13 @@ public abstract class NetworkingAI implements Runnable {
             networkIOManager.write("request maxStick");
             networkIOManager.write("request currentSticks");
         }
-        
+
     }
 
     private synchronized boolean requestIsMatchStillActive() {
-        
+
         return matchStillActive;
-        
+
     }
 
     private synchronized void terminate() {
@@ -311,7 +325,7 @@ public abstract class NetworkingAI implements Runnable {
                         hasWonMatch = false;
                     }
                 }
-                
+
                 if (command.contains("matchStillActive")) {
                     if (command.contains("true")) {
                         matchStillActive = true;
