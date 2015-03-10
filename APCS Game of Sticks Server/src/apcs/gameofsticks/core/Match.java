@@ -24,13 +24,13 @@ public class Match extends Thread {
     private volatile int maxSticksToTake;
 
     private volatile Lobby lobby;
-    
+
     public Match(Lobby lobby, int totalSticks, int maxSticksToTake, Client player1, Client player2) {
         synchronized (this) {
             this.totalSticks = totalSticks;
             this.sticksRemaining = totalSticks;
             this.maxSticksToTake = maxSticksToTake;
-            this.matchID = matchID++;
+            this.matchID = lastMatchID++;
             this.lobby = lobby;
             this.player1 = player1;
             this.player2 = player2;
@@ -38,31 +38,35 @@ public class Match extends Thread {
         }
     }
 
-    public synchronized boolean isMatchStillActive(){
+    public synchronized boolean isMatchStillActive() {
         return sticksRemaining != 0;
     }
-    
-    public synchronized int getSticksRemaining(){
+
+    public synchronized int getSticksRemaining() {
         return sticksRemaining;
     }
-    
-    public synchronized int getTotalSticks(){
+
+    public synchronized int getTotalSticks() {
         return totalSticks;
     }
-    
-    public synchronized int getMaxSticksToTake(){
+
+    public synchronized int getMaxSticksToTake() {
         return maxSticksToTake;
     }
-    
-    public synchronized boolean isWinner(Client c){
+
+    public synchronized boolean isWinner(Client c) {
         return c == winningClient;
     }
-    
+
     @Override
     public void run() {
 
+        int round = 0;
+
         synchronized (this) {
+
             while (sticksRemaining != 0) {
+                System.out.println(matchID + "- " + ++round);
                 activeClient = player1;
                 takeSticks(player1);
                 if (sticksRemaining != 0) {
@@ -81,27 +85,36 @@ public class Match extends Thread {
     }
 
     private synchronized void takeSticks(Client c) {
-        synchronized(this){
+        synchronized (this) {
+            System.out.println("Waiting - " + c);
+            c.matchStillActive(true);
+            c.isTurn();
             c.getSticksTaken();
             c.clearSticksTaken();
         }
     }
-    
-    public synchronized boolean isClientTurn(Client c){
+
+    public synchronized boolean isClientTurn(Client c) {
         return c == activeClient;
     }
 
     private synchronized void winner(Client c) {
         winningClient = c;
+        player1.matchStillActive(false);
+        player2.matchStillActive(false);
     }
-    
-    public synchronized void terminate(Client c){
-        if(c == player1){
+
+    public synchronized int getMatchID() {
+        return matchID;
+    }
+
+    public synchronized void terminate(Client c) {
+        if (c == player1) {
             lobby.addToLobby(player2);
-        } else{
+        } else {
             lobby.addToLobby(player1);
         }
-        
+
         //kill THIS!!!!
     }
 

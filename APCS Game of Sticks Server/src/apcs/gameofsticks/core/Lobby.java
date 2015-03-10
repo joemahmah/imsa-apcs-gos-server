@@ -7,6 +7,8 @@ package apcs.gameofsticks.core;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Holds clients while they are waiting for a match.
@@ -94,6 +96,20 @@ public class Lobby implements Runnable {
     @Override
     public void run() {
 
+        while(true){
+            try {
+//                System.out.println(clientsInLobby.size());
+                for(Client c: clientsInLobby){
+                    if(c.getClientSocket().isClosed()){
+                        clientsInLobby.remove(c);
+                    }
+                }
+                Thread.sleep(50);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Lobby.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
     }
 
 }

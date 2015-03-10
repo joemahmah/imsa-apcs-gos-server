@@ -48,6 +48,8 @@ public class MatchMaker implements Runnable {
                         Match match = new Match(lobby, 20, 3, client1, client2);
                         client1.joinMatch(match);
                         client2.joinMatch(match);
+                        
+                        System.out.println("Match made (" + match.getMatchID() + "): " + client1 + " v. " + client2);
                     }
                 } catch (Exception ex) {
                     Logger.getLogger(MatchMaker.class.getName()).log(Level.SEVERE, null, ex);

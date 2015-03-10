@@ -5,10 +5,14 @@
  */
 package apcs.gameofsticks.client;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -29,16 +33,23 @@ public abstract class NetworkingAI implements Runnable {
     private volatile boolean isTurn;
     private volatile boolean inMatch;
 
+    private NetworkIOManager networkIOManager;
+
     /**
      *
      * @param host The ip of the server.
      */
     public NetworkingAI(String host) {
-        this.host = host;
-        this.isTurn = false;
-        this.inMatch = false;
-        
-        connectToServer();
+        try {
+            this.host = host;
+            this.isTurn = false;
+            this.inMatch = false;
+
+            connectToServer();
+            networkIOManager = new NetworkIOManager();
+        } catch (IOException ex) {
+            Logger.getLogger(NetworkingAI.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private void connectToServer() {
@@ -109,21 +120,29 @@ public abstract class NetworkingAI implements Runnable {
     public void run() {
         synchronized (this) {
             while (true) {
-                waitForMatch();
-                requestMatchData();
-                while (requestIsMatchStillActive()) {
-                    waitForTurn();
-                    requestMatchDataUpdate();
-                    playGame();
+                try {
+                    waitForMatch();
+                    requestMatchData();
+                    Thread.sleep(100);
+                    while (requestIsMatchStillActive()) {
+                        waitForTurn();
+                        requestMatchDataUpdate();
+                        System.out.println("Play");
+                        playGame();
+                    }
+                    requestHasWonMatch();
+                    gameOver();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(NetworkingAI.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                requestHasWonMatch();
-                gameOver();
             }
         }
     }
 
     private synchronized void waitForTurn() {
 
+        System.out.println("Waiting for turn...");
+        
         synchronized (this) {
             while (!isTurn) {
 
@@ -150,6 +169,9 @@ public abstract class NetworkingAI implements Runnable {
             while (!inMatch) {
 
             }
+            
+            System.out.println("Joined Match!");
+            matchStillActive = true;
         }
 
     }
@@ -157,65 +179,71 @@ public abstract class NetworkingAI implements Runnable {
     private synchronized void requestMatchData() {
 
         synchronized (this) {
-
+            networkIOManager.write("request maxStick");
+            networkIOManager.write("request currentSticks");
         }
 
     }
 
     private synchronized void requestMatchDataUpdate() {
 
+        synchronized (this) {
+            networkIOManager.write("request maxStick");
+            networkIOManager.write("request currentSticks");
+        }
+        
     }
 
     private synchronized boolean requestIsMatchStillActive() {
-        return false;
+        
+        return matchStillActive;
+        
     }
 
     private synchronized void terminate() {
+
+        try {
+            socket.close();
+        } catch (IOException ex) {
+            Logger.getLogger(NetworkingAI.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
     }
 
     private class NetworkIOManager extends Thread {
 
-        private volatile Scanner in;
+        private volatile BufferedReader in;
         private volatile PrintWriter out;
 
         private NetworkIOManager() throws IOException {
 
-            in = new Scanner(socket.getInputStream());
-            out = new PrintWriter(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new PrintWriter(socket.getOutputStream(), true);
+
             this.start();
 
         }
 
-        public synchronized void listen() {
-            synchronized (this) {
-                if (in.hasNextLine()) {
-                    parseCommand(in.nextLine());
+        public void listen() {
+            try {
+                String input;
+                if ((input = in.readLine()) != null) {
+                    parseCommand(input);
                 }
+            } catch (IOException ex) {
+                Logger.getLogger(NetworkingAI.class.getName()).log(Level.SEVERE, null, ex);
             }
+
         }
 
         @Override
         public void run() {
-            synchronized (this) {
-                while (true) {
-                    listen();
-                }
+            while (true) {
+                listen();
             }
+
         }
 
-        /*
-        
-        
-         private volatile boolean matchStillActive;
-         private volatile int maxSticksTaken;
-         private volatile int sticksRemaining;
-         private volatile boolean hasWonMatch;
-
-         private volatile boolean isTurn;
-         private volatile boolean inMatch;
-        
-         */
         /**
          *
          * @see Possible commands:
@@ -272,7 +300,7 @@ public abstract class NetworkingAI implements Runnable {
                     inMatch = true;
                 }
 
-                if (command.contains("isTurn")) {
+                if (command.contains("isTurn")) { //Make take boolean?
                     isTurn = true;
                 }
 
@@ -281,6 +309,14 @@ public abstract class NetworkingAI implements Runnable {
                         hasWonMatch = true;
                     } else {
                         hasWonMatch = false;
+                    }
+                }
+                
+                if (command.contains("matchStillActive")) {
+                    if (command.contains("true")) {
+                        matchStillActive = true;
+                    } else {
+                        matchStillActive = false;
                     }
                 }
             }

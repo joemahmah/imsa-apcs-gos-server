@@ -5,9 +5,13 @@
  */
 package apcs.gameofsticks.core;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -16,22 +20,27 @@ import java.util.Scanner;
 public class ClientIO extends Thread {
 
     private Client client;
-    private volatile Scanner in;
+    private volatile BufferedReader in;
     private volatile PrintWriter out;
 
     public ClientIO(Client client) throws IOException {
         this.client = client;
 
-        in = new Scanner(client.getClientSocket().getInputStream());
-        out = new PrintWriter(client.getClientSocket().getOutputStream());
+        in = new BufferedReader(new InputStreamReader(client.getClientSocket().getInputStream()));
+        out = new PrintWriter(client.getClientSocket().getOutputStream(), true);
 
         this.start();
     }
 
     public synchronized void listen() {
         synchronized (this) {
-            if (in.hasNextLine()) {
-                parseCommand(in.nextLine());
+            try {
+                String input;
+                if ((input = in.readLine()) != null) {
+                    parseCommand(input);
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(ClientIO.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -99,7 +108,8 @@ public class ClientIO extends Thread {
         }
     }
 
-    public synchronized void write(String message) {
+    public void write(String message) {
+        System.out.println("Writing " + message + " to " + client);
         out.println(message);
     }
 

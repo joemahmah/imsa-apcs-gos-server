@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 public class Client implements Runnable {
 
     private String id; //User's id will be their IP
+    private static volatile int ID = 0;
 
     private Socket socket;
     private volatile ClientIO clientIO;
@@ -38,7 +39,9 @@ public class Client implements Runnable {
     public Client(Socket socket) {
         this.socket = socket;
 
-        id = socket.getInetAddress() + "";
+        synchronized (this) {
+            id = ID++ + "";
+        }
 
         isReady = false;
         state = ClientState.lobby;
@@ -50,6 +53,8 @@ public class Client implements Runnable {
         }
 
         sticksTaken = -404;
+
+        flagReady();
     }
 
     /**
@@ -59,12 +64,16 @@ public class Client implements Runnable {
      */
     public synchronized void joinMatch(Match match) {
         this.match = match;
+        
+        synchronized(this){
+        clientIO.write("inMatch");
+        }
     }
 
-    public Match getMatch(){
+    public Match getMatch() {
         return match;
     }
-    
+
     /**
      * Gets the client's socket.
      *
@@ -97,6 +106,10 @@ public class Client implements Runnable {
         return isReady;
     }
 
+    public synchronized void matchStillActive(boolean isActive){
+        clientIO.write("matchStillActive " + isActive);
+    }
+    
     /**
      * Main loop for the client.
      */
@@ -123,29 +136,29 @@ public class Client implements Runnable {
     public synchronized void isTurn() {
         synchronized (this) {
             if (match != null) {
-                clientIO.write(match.isClientTurn(this) + "");
+                clientIO.write("isTurn");
             }
         }
     }
 
-    public synchronized void getWinner(){
-        if(match != null && !match.isMatchStillActive()){
-            
+    public synchronized void getWinner() {
+        if (match != null && !match.isMatchStillActive()) {
+
         }
     }
-    
-    public synchronized void getSticksRemaining(){
-        if(match != null){
-            clientIO.write(match.getSticksRemaining()+"");
+
+    public synchronized void getSticksRemaining() {
+        if (match != null) {
+            clientIO.write(match.getSticksRemaining() + "");
         }
     }
-    
-    public synchronized void getMaxSticks(){
-        if(match != null){
-            clientIO.write(match.getMaxSticksToTake()+"");
+
+    public synchronized void getMaxSticks() {
+        if (match != null) {
+            clientIO.write(match.getMaxSticksToTake() + "");
         }
     }
-    
+
     public synchronized void takeSticks(int num) {
         sticksTaken = num;
     }
@@ -165,6 +178,10 @@ public class Client implements Runnable {
                 System.out.println("Client " + id + " has been disconnected!");
             }
         }
+    }
+
+    public String toString() {
+        return "" + id;
     }
 
 }

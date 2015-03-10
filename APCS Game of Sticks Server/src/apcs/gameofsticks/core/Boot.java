@@ -15,7 +15,7 @@ import java.net.Socket;
  */
 public class Boot {
 
-    private final int PORT = 4269;
+    private final int PORT = 80;
 
     Lobby lobby;
     MatchMaker matchMaker;
@@ -57,7 +57,7 @@ public class Boot {
                 Thread clientThread = new Thread(client);
                 clientThread.start();
                 
-                System.out.println("Client added to lobby (" + socket.getInetAddress() + ")");
+                System.out.println("Client added to lobby (" + client + ")");
 
             }
         } catch (IOException e) {
