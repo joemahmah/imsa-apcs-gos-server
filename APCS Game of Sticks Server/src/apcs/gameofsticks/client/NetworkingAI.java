@@ -34,7 +34,7 @@ public abstract class NetworkingAI implements Runnable {
     private volatile boolean inMatch;
 
     private NetworkIOManager networkIOManager;
-    
+
     private volatile String replyTakeSticks = null;
 
     /**
@@ -98,6 +98,8 @@ public abstract class NetworkingAI implements Runnable {
 
         }
 
+        System.out.println("BACK");
+
         if (replyTakeSticks.contains("GOOD")) {
             replyTakeSticks = null;
             return true;
@@ -137,11 +139,14 @@ public abstract class NetworkingAI implements Runnable {
             while (true) {
                 try {
                     waitForMatch();
+                    Thread.sleep(50);
                     requestMatchData();
-                    Thread.sleep(100);
+                    Thread.sleep(50);
                     while (requestIsMatchStillActive()) {
                         waitForTurn();
+                        Thread.sleep(50);
                         requestMatchDataUpdate();
+                        Thread.sleep(50);
                         playGame();
                     }
                     requestHasWonMatch();
@@ -192,19 +197,23 @@ public abstract class NetworkingAI implements Runnable {
 
     private synchronized void requestMatchData() {
 
-        synchronized (this) {
-            networkIOManager.write("request maxStick");
-            networkIOManager.write("request currentSticks");
-        }
+        System.out.println("Loading game data...");
+        
+//        synchronized (this) {
+        networkIOManager.write("request maxStick");
+        networkIOManager.write("request currentSticks");
+//        }
 
     }
 
     private synchronized void requestMatchDataUpdate() {
 
-        synchronized (this) {
-            networkIOManager.write("request maxStick");
-            networkIOManager.write("request currentSticks");
-        }
+        System.out.println("Requesting game data...");
+        
+//        synchronized (this) {
+        networkIOManager.write("request maxStick");
+        networkIOManager.write("request currentSticks");
+//        }
 
     }
 
@@ -234,6 +243,9 @@ public abstract class NetworkingAI implements Runnable {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
 
+//            write("hello");
+//            write("next msh");
+//            write("Y01O");
             this.start();
 
         }
@@ -242,6 +254,7 @@ public abstract class NetworkingAI implements Runnable {
             try {
                 String input;
                 if ((input = in.readLine()) != null) {
+                    System.out.println("Recieved " + input + " from the server.");
                     parseCommand(input);
                 }
             } catch (IOException ex) {
@@ -333,10 +346,19 @@ public abstract class NetworkingAI implements Runnable {
                         matchStillActive = false;
                     }
                 }
+
+                if (command.contains("STICK_")) {
+                    if (command.contains("GOOD")) {
+                        replyTakeSticks = "GOOD";
+                    } else {
+                        replyTakeSticks = "BAD";
+                    }
+                }
             }
         }
 
         public synchronized void write(String message) {
+            System.out.println("Sent " + message + " to the server.");
             out.println(message);
         }
 

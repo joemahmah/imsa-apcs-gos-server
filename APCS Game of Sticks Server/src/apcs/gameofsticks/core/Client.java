@@ -64,9 +64,9 @@ public class Client implements Runnable {
      */
     public synchronized void joinMatch(Match match) {
         this.match = match;
-        
-        synchronized(this){
-        clientIO.write("inMatch");
+
+        synchronized (this) {
+            clientIO.write("inMatch");
         }
     }
 
@@ -106,10 +106,10 @@ public class Client implements Runnable {
         return isReady;
     }
 
-    public synchronized void matchStillActive(boolean isActive){
+    public synchronized void matchStillActive(boolean isActive) {
         clientIO.write("matchStillActive " + isActive);
     }
-    
+
     /**
      * Main loop for the client.
      */
@@ -123,7 +123,7 @@ public class Client implements Runnable {
     public synchronized int getSticksTaken() {
         synchronized (this) {
             while (sticksTaken <= 0) {
-                
+
             }
             return sticksTaken;
         }
@@ -148,14 +148,18 @@ public class Client implements Runnable {
     }
 
     public synchronized void getSticksRemaining() {
-        if (match != null) {
-            clientIO.write(match.getSticksRemaining() + "");
+        synchronized (clientIO) {
+            if (match != null) {
+                clientIO.write(match.getSticksRemaining() + "");
+            }
         }
     }
 
     public synchronized void getMaxSticks() {
-        if (match != null) {
-            clientIO.write(match.getMaxSticksToTake() + "");
+        synchronized (clientIO) {
+            if (match != null) {
+                clientIO.write(match.getMaxSticksToTake() + "");
+            }
         }
     }
 

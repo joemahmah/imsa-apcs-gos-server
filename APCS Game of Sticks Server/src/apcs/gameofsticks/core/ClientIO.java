@@ -33,7 +33,7 @@ public class ClientIO extends Thread {
     }
 
     public synchronized void listen() {
-        synchronized (this) {
+//        synchronized (this) {
             try {
                 String input;
                 if ((input = in.readLine()) != null) {
@@ -42,16 +42,15 @@ public class ClientIO extends Thread {
             } catch (IOException ex) {
                 Logger.getLogger(ClientIO.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
+//        }
     }
 
     @Override
     public void run() {
-        synchronized (this) {
+//        synchronized (this) {
             while (true) {
                 listen();
-                System.out.println("Listen");
-            }
+//            }
         }
     }
 
@@ -69,7 +68,7 @@ public class ClientIO extends Thread {
     private void parseCommand(String command) {
         synchronized (this) {
 
-            System.out.println("Message " + command + " recieved.");
+            System.out.println("Message " + command + " recieved from client " + client + ".");
             
             if (command.contains("request maxStick")) {
                 client.getMaxSticks();
@@ -112,7 +111,7 @@ public class ClientIO extends Thread {
     }
 
     public void write(String message) {
-        System.out.println("Writing " + message + " to " + client);
+        System.out.println("Sent " + message + " to client " + client + ".");
         out.println(message);
     }
 
