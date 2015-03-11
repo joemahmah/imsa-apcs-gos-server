@@ -21,9 +21,13 @@ public class Client implements Runnable {
     private String id; //User's id will be their IP
     private static volatile int ID = 0;
 
+    private int wins = 0;
+    private int losses = 0;
+    private int gamesPlayed = 0;
+
     private Socket socketOut;
     private Socket socketIn;
-    
+
     private volatile ClientIO clientIO;
     private volatile Match match;
 
@@ -41,7 +45,7 @@ public class Client implements Runnable {
     public Client(Socket socketOut, Socket socketIn) {
         this.socketOut = socketOut;
         this.socketIn = socketIn;
-        
+
         match = null;
 
         synchronized (this) {
@@ -70,9 +74,10 @@ public class Client implements Runnable {
     public synchronized void joinMatch(Match match) {
         this.match = match;
 
-        synchronized (this) {
-            clientIO.write("inMatch");
-        }
+//        synchronized (this) {
+        clientIO.write("inMatch");
+        gamesPlayed++;
+//        }
     }
 
     public Match getMatch() {
@@ -96,7 +101,7 @@ public class Client implements Runnable {
     public Socket getSocketIn() {
         return socketIn;
     }
-    
+
     /**
      * Flag the client as ready to play a match.
      */
@@ -150,31 +155,38 @@ public class Client implements Runnable {
 
     public void isTurn() {
 //        synchronized (this) {
-            if (match != null) {
-                clientIO.write("isTurn");
-            }
+        if (match != null) {
+            clientIO.write("isTurn");
+        }
 //        }
     }
 
     public void getWinner() {
         if (match != null && !match.isMatchStillActive()) {
-            clientIO.write("isWinner " + (this == match.getWinner()));
+            boolean won = this == match.getWinner();
+            clientIO.write("isWinner " + (won));
+            
+            if(won){
+                wins++;
+            } else{
+                losses++;
+            }
         }
     }
 
     public void getSticksRemaining() {
 //        synchronized (clientIO) {
-            if (match != null) {
-                clientIO.write(match.getSticksRemaining() + "");
-            }
+        if (match != null) {
+            clientIO.write(match.getSticksRemaining() + "");
+        }
 //        }
     }
 
     public void getMaxSticks() {
 //        synchronized (this) {
-            if (match != null) {
-                clientIO.write(match.getMaxSticksToTake() + "");
-            }
+        if (match != null) {
+            clientIO.write(match.getMaxSticksToTake() + "");
+        }
 //        }
     }
 
@@ -184,19 +196,19 @@ public class Client implements Runnable {
 
     public void terminate() {
 //        synchronized (this) {
-            try {
-                clientIO.write("terminated");
-                if (match != null) {
-                    match.terminate(this);
-                }
-                match = null;
-                socketOut.close();
-                socketIn.close();
-            } catch (IOException ex) {
-                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                System.out.println("Client " + id + " has been disconnected!");
+        try {
+            clientIO.write("terminated");
+            if (match != null) {
+                match.terminate(this);
             }
+            match = null;
+            socketOut.close();
+            socketIn.close();
+        } catch (IOException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            System.out.println("Client " + id + " has been disconnected!");
+        }
 //        }
     }
 
