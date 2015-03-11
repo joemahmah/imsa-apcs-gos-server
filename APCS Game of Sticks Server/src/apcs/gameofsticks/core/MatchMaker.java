@@ -12,7 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Matches clients together from a lobby. Handles match generation.
  * @author mhrcek
  */
 public class MatchMaker implements Runnable {

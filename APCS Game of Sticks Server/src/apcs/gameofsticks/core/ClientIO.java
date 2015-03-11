@@ -14,7 +14,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Handles IO for the client.
+ * 
  * @author mhrcek
  */
 public class ClientIO extends Thread {

@@ -12,7 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Logs games.
  * @author mhrcek
  * @deprecated Not used. Meant to log matches.
  */

@@ -6,7 +6,8 @@
 package apcs.gameofsticks.core;
 
 /**
- *
+ * Various client states.
+ * 
  * @author mhrcek
  */
 public enum ClientState {

@@ -10,7 +10,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
- *
+ * Launches the program.
+ * 
  * @author mhrcek
  */
 public class Boot {
