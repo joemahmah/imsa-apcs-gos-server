@@ -158,7 +158,7 @@ public class Client implements Runnable {
 
     public void getWinner() {
         if (match != null && !match.isMatchStillActive()) {
-
+            clientIO.write("isWinner " + (this == match.getWinner()));
         }
     }
 

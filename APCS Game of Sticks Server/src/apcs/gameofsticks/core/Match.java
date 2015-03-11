@@ -127,6 +127,10 @@ public class Match extends Thread {
         player1.matchStillActive(false);
         player2.matchStillActive(false);
     }
+    
+    public Client getWinner(){
+        return winningClient;
+    }
 
     public int getMatchID() {
         return matchID;
