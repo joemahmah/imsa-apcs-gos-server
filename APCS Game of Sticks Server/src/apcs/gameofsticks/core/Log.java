@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 /**
  *
  * @author mhrcek
+ * @deprecated Not used. Meant to log matches.
  */
 public class Log {
     

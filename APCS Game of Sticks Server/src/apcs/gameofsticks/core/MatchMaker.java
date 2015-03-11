@@ -27,6 +27,9 @@ public class MatchMaker implements Runnable {
         this.lobby = lobby;
     }
 
+    /**
+     * Matches clients to play matches. Matches are made monte carlo.
+     */
     @Override
     public void run() {
         synchronized (this) {

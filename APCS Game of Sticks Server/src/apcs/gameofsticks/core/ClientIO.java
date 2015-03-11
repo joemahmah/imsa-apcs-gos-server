@@ -23,6 +23,12 @@ public class ClientIO extends Thread {
     private volatile BufferedReader in;
     private volatile PrintWriter out;
 
+    /**
+     * Client IO handler.
+     * 
+     * @param client Client associated with the handler.
+     * @throws IOException 
+     */
     public ClientIO(Client client) throws IOException {
         this.client = client;
 
@@ -32,6 +38,9 @@ public class ClientIO extends Thread {
         this.start();
     }
 
+    /**
+     * Listens for input from the client.
+     */
     public synchronized void listen() {
 //        synchronized (this) {
             try {
@@ -55,11 +64,13 @@ public class ClientIO extends Thread {
     }
 
     /**
+     * Parses commands.
      *
      * @see Possible commands:
      * @see request maxStick
      * @see request currentSticks
      * @see request winner
+     * @see request turn
      * @see take stick [number]
      * @see terminate
      *
@@ -110,6 +121,10 @@ public class ClientIO extends Thread {
         }
     }
 
+    /**
+     * Writes the message to the client.
+     * @param message Message to be written.
+     */
     public void write(String message) {
         System.out.println("Sent " + message + " to client " + client + ".");
         out.println(message);

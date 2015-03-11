@@ -80,6 +80,11 @@ public class Client implements Runnable {
 //        }
     }
 
+    /**
+     * Gets the current match being played. Not used...
+     * @deprecated 
+     * @return 
+     */
     public Match getMatch() {
         return match;
     }
@@ -125,6 +130,10 @@ public class Client implements Runnable {
         return isReady;
     }
 
+    /**
+     * Tells the client if the match is still active.
+     * @param isActive 
+     */
     public synchronized void matchStillActive(boolean isActive) {
         clientIO.write("matchStillActive " + isActive);
     }
@@ -139,6 +148,12 @@ public class Client implements Runnable {
         }
     }
 
+    /**
+     * Waits for the client to send the data. Once data is sent, it is reported to the server.
+     * @return The number of sticks taken by the client.
+     * @see Error checking handled in the IO handler.
+     * @see clearSticksTaken() MUST be run to use this method again.
+     */
     public int getSticksTaken() {
         synchronized (this) {
             while (sticksTaken <= 0) {
@@ -149,10 +164,16 @@ public class Client implements Runnable {
         }
     }
 
+    /**
+     * Cleans up so the getSticksTaken method can be run again.
+     */
     public void clearSticksTaken() {
         sticksTaken = -404;
     }
 
+    /**
+     * Tells the client that it is their turn to play.s
+     */
     public void isTurn() {
 //        synchronized (this) {
         if (match != null) {
@@ -161,6 +182,9 @@ public class Client implements Runnable {
 //        }
     }
 
+    /**
+     * Tells the client who the winner is. Also adds statistics to the serverside client.
+     */
     public void getWinner() {
         if (match != null && !match.isMatchStillActive()) {
             boolean won = this == match.getWinner();
@@ -174,6 +198,9 @@ public class Client implements Runnable {
         }
     }
 
+    /**
+     * Tells the client how many sticks remain.
+     */
     public void getSticksRemaining() {
 //        synchronized (clientIO) {
         if (match != null) {
@@ -182,6 +209,9 @@ public class Client implements Runnable {
 //        }
     }
 
+    /**
+     * Tells the client how many sticks it may take.
+     */
     public void getMaxSticks() {
 //        synchronized (this) {
         if (match != null) {
@@ -190,10 +220,18 @@ public class Client implements Runnable {
 //        }
     }
 
+    /**
+     * Sets the number of sticks taken.
+     * @param num Number of sticks to take.
+     */
     public void takeSticks(int num) {
         sticksTaken = num;
     }
 
+    /**
+     * Not used. Original purpose was to kill the client safely.
+     * @deprecated 
+     */
     public void terminate() {
 //        synchronized (this) {
         try {
@@ -212,6 +250,10 @@ public class Client implements Runnable {
 //        }
     }
 
+    /**
+     * Makes the client object human readable...
+     * @return 
+     */
     public String toString() {
         return "" + id;
     }
