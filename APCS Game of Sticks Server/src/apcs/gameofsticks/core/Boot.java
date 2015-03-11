@@ -48,8 +48,9 @@ public class Boot {
             
             while (true) {
 
-                Socket socket = server.accept();
-                Client client = new Client(socket);
+                Socket socketOut = server.accept();
+                Socket socketIn = server.accept();
+                Client client = new Client(socketOut, socketIn);
 
                 synchronized (this) {
                     lobby.addToLobby(client);

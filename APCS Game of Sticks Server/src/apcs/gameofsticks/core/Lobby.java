@@ -100,7 +100,7 @@ public class Lobby implements Runnable {
             try {
 //                System.out.println(clientsInLobby.size());
                 for(Client c: clientsInLobby){
-                    if(c.getClientSocket().isClosed()){
+                    if(c.getSocketOut().isClosed()){
                         clientsInLobby.remove(c);
                     }
                 }

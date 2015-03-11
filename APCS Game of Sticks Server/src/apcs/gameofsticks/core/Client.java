@@ -21,7 +21,9 @@ public class Client implements Runnable {
     private String id; //User's id will be their IP
     private static volatile int ID = 0;
 
-    private Socket socket;
+    private Socket socketOut;
+    private Socket socketIn;
+    
     private volatile ClientIO clientIO;
     private volatile Match match;
 
@@ -34,10 +36,13 @@ public class Client implements Runnable {
     /**
      * The constructor for the client.
      *
-     * @param socket
+     * @param socketOut
      */
-    public Client(Socket socket) {
-        this.socket = socket;
+    public Client(Socket socketOut, Socket socketIn) {
+        this.socketOut = socketOut;
+        this.socketIn = socketIn;
+        
+        match = null;
 
         synchronized (this) {
             id = ID++ + "";
@@ -75,14 +80,23 @@ public class Client implements Runnable {
     }
 
     /**
-     * Gets the client's socket.
+     * Gets the client's output socket.
      *
      * @return Client socket.
      */
-    public Socket getClientSocket() {
-        return socket;
+    public Socket getSocketOut() {
+        return socketOut;
     }
 
+    /**
+     * Gets the client's input socket.
+     *
+     * @return Client socket.
+     */
+    public Socket getSocketIn() {
+        return socketIn;
+    }
+    
     /**
      * Flag the client as ready to play a match.
      */
@@ -120,68 +134,70 @@ public class Client implements Runnable {
         }
     }
 
-    public synchronized int getSticksTaken() {
+    public int getSticksTaken() {
         synchronized (this) {
             while (sticksTaken <= 0) {
-
+                System.err.print(""); //This actually fixes the sync issue...
             }
+            System.out.println("Client " + this + " took " + sticksTaken + " sticks...");
             return sticksTaken;
         }
     }
 
-    public synchronized void clearSticksTaken() {
+    public void clearSticksTaken() {
         sticksTaken = -404;
     }
 
-    public synchronized void isTurn() {
-        synchronized (this) {
+    public void isTurn() {
+//        synchronized (this) {
             if (match != null) {
                 clientIO.write("isTurn");
             }
-        }
+//        }
     }
 
-    public synchronized void getWinner() {
+    public void getWinner() {
         if (match != null && !match.isMatchStillActive()) {
 
         }
     }
 
-    public synchronized void getSticksRemaining() {
-        synchronized (clientIO) {
+    public void getSticksRemaining() {
+//        synchronized (clientIO) {
             if (match != null) {
                 clientIO.write(match.getSticksRemaining() + "");
             }
-        }
+//        }
     }
 
-    public synchronized void getMaxSticks() {
-        synchronized (clientIO) {
+    public void getMaxSticks() {
+//        synchronized (this) {
             if (match != null) {
                 clientIO.write(match.getMaxSticksToTake() + "");
             }
-        }
+//        }
     }
 
-    public synchronized void takeSticks(int num) {
+    public void takeSticks(int num) {
         sticksTaken = num;
     }
 
-    public synchronized void terminate() {
-        synchronized (this) {
+    public void terminate() {
+//        synchronized (this) {
             try {
                 clientIO.write("terminated");
                 if (match != null) {
                     match.terminate(this);
                 }
                 match = null;
-                socket.close();
+                socketOut.close();
+                socketIn.close();
             } catch (IOException ex) {
                 Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
             } finally {
                 System.out.println("Client " + id + " has been disconnected!");
             }
-        }
+//        }
     }
 
     public String toString() {

@@ -26,8 +26,8 @@ public class ClientIO extends Thread {
     public ClientIO(Client client) throws IOException {
         this.client = client;
 
-        in = new BufferedReader(new InputStreamReader(client.getClientSocket().getInputStream()));
-        out = new PrintWriter(client.getClientSocket().getOutputStream(), true);
+        in = new BufferedReader(new InputStreamReader(client.getSocketIn().getInputStream()));
+        out = new PrintWriter(client.getSocketOut().getOutputStream(), true);
 
         this.start();
     }

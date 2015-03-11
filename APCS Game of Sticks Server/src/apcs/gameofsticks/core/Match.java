@@ -5,6 +5,9 @@
  */
 package apcs.gameofsticks.core;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author mhrcek
@@ -38,23 +41,23 @@ public class Match extends Thread {
         }
     }
 
-    public synchronized boolean isMatchStillActive() {
+    public boolean isMatchStillActive() {
         return sticksRemaining != 0;
     }
 
-    public synchronized int getSticksRemaining() {
+    public int getSticksRemaining() {
         return sticksRemaining;
     }
 
-    public synchronized int getTotalSticks() {
+    public int getTotalSticks() {
         return totalSticks;
     }
 
-    public synchronized int getMaxSticksToTake() {
+    public int getMaxSticksToTake() {
         return maxSticksToTake;
     }
 
-    public synchronized boolean isWinner(Client c) {
+    public boolean isWinner(Client c) {
         return c == winningClient;
     }
 
@@ -67,11 +70,12 @@ public class Match extends Thread {
 
             while (sticksRemaining != 0) {
                 System.out.println("Match " + matchID + ": Round " + ++round);
-                System.out.println("Match " + matchID + ": Player 1 Active");
+                System.out.println("Match " + matchID + ": Client " + player1 + " active.");
                 activeClient = player1;
                 takeSticks(player1);
+                halt(10);
                 if (sticksRemaining != 0) {
-                    System.out.println("Match " + matchID + ": Player 2 Active");
+                    System.out.println("Match " + matchID + ": Client " + player2 + " active.");
                     activeClient = player2;
                     takeSticks(player2);
                     if (sticksRemaining == 0) {
@@ -82,35 +86,53 @@ public class Match extends Thread {
                     winner(player2);
                     break;
                 }
+                halt(50);
             }
+            
+            halt(500);
+            isOver();
         }
     }
 
-    private synchronized void takeSticks(Client c) {
-        synchronized (this) {
-            System.out.println("Waiting - " + c);
-            c.matchStillActive(true);
-            c.isTurn();
-            c.getSticksTaken();
-            c.clearSticksTaken();
+    private void halt(int millis) {
+        try {
+            sleep(millis);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Match.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public synchronized boolean isClientTurn(Client c) {
+    private void takeSticks(Client c) {
+//        synchronized (this) {
+        System.out.println("Match " + matchID + ": Waiting on client " + c + ".");
+        halt(10);
+        c.matchStillActive(true);
+        halt(10);
+        c.isTurn();
+        halt(10);
+        int i = c.getSticksTaken();
+        System.out.println("Match " + matchID + ": Client " + c + " took " + i + " sticks.");
+        sticksRemaining -= i;
+        halt(10);
+        c.clearSticksTaken();
+        halt(10);
+    }
+
+    public boolean isClientTurn(Client c) {
         return c == activeClient;
     }
 
-    private synchronized void winner(Client c) {
+    private void winner(Client c) {
         winningClient = c;
         player1.matchStillActive(false);
         player2.matchStillActive(false);
     }
 
-    public synchronized int getMatchID() {
+    public int getMatchID() {
         return matchID;
     }
 
-    public synchronized void terminate(Client c) {
+    public void terminate(Client c) {
         if (c == player1) {
             lobby.addToLobby(player2);
         } else {
@@ -118,6 +140,12 @@ public class Match extends Thread {
         }
 
         //kill THIS!!!!
+    }
+    
+    public void isOver(){
+        lobby.addToLobby(player1);
+        lobby.addToLobby(player2);
+        
     }
 
     /*
