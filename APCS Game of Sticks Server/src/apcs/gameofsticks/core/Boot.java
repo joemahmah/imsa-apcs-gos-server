@@ -16,7 +16,7 @@ import java.net.Socket;
  */
 public class Boot {
 
-    private final int PORT = 80;
+    private final int PORT = 404;
 
     Lobby lobby;
     MatchMaker matchMaker;

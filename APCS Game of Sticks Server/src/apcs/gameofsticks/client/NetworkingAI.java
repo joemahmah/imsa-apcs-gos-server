@@ -23,7 +23,7 @@ import java.util.logging.Logger;
  */
 public abstract class NetworkingAI extends Thread {
 
-    private static final int PORT = 80;
+    private static final int PORT = 404;
     private String host;
 
     private Socket socketOut;
