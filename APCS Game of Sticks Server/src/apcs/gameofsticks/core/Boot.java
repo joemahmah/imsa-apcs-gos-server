@@ -11,7 +11,7 @@ import java.net.Socket;
 
 /**
  * Launches the program.
- * 
+ *
  * @author mhrcek
  */
 public class Boot {
@@ -41,12 +41,11 @@ public class Boot {
             lobbyThread.start();
 
             matchMaker = new MatchMaker(lobby);
-            Thread matchMakerThread = new Thread(matchMaker);
-            matchMakerThread.start();
+            matchMaker.start();
 
             System.out.println("Server started!");
             System.out.println("Waiting for clients...");
-            
+
             while (true) {
 
                 Socket socketOut = server.accept();
@@ -58,7 +57,7 @@ public class Boot {
                 }
                 Thread clientThread = new Thread(client);
                 clientThread.start();
-                
+
                 System.out.println("Client added to lobby (" + client + ")");
 
             }

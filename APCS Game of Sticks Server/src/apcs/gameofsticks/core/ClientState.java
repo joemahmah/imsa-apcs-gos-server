@@ -7,16 +7,16 @@ package apcs.gameofsticks.core;
 
 /**
  * Various client states.
- * 
+ *
  * @author mhrcek
  */
 public enum ClientState {
-    
+
     lobby,
     pregame,
     game_turn,
     game_waiting,
     game_needsAnswer,
     postgame;
-    
+
 }

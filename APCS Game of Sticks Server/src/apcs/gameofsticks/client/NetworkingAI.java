@@ -9,21 +9,25 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import static java.lang.Thread.sleep;
 import java.net.Socket;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Abstract class which handles networking.
  *
+ * @see DO NOT EDIT
  * @author mhrcek
  */
-public abstract class NetworkingAI implements Runnable {
+public abstract class NetworkingAI extends Thread {
 
     private static final int PORT = 80;
     private String host;
 
-    private Socket socket;
+    private Socket socketOut;
+    private Socket socketIn;
 
     private volatile boolean matchStillActive;
     private volatile int maxSticksTaken;
@@ -38,6 +42,7 @@ public abstract class NetworkingAI implements Runnable {
     private volatile String replyTakeSticks = null;
 
     /**
+     * Constructor. Automatically connects to the server.
      *
      * @param host The ip of the server.
      */
@@ -54,13 +59,16 @@ public abstract class NetworkingAI implements Runnable {
         }
     }
 
+    /**
+     * Handles the actual connection to the server.
+     */
     private void connectToServer() {
 
         try {
-            socket = new Socket(host, PORT);
+            socketIn = new Socket(host, PORT);
+            socketOut = new Socket(host, PORT);
 
-            Thread t = new Thread(this);
-            t.start();
+            start();
         } catch (IOException e) {
             System.err.println("Unable to connect to server!");
         }
@@ -72,7 +80,7 @@ public abstract class NetworkingAI implements Runnable {
      *
      * @return Maximum number of sticks that may be taken.
      */
-    public synchronized int getMaxSticksTaken() {
+    public int getMaxSticksTaken() {
         return maxSticksTaken;
     }
 
@@ -81,7 +89,7 @@ public abstract class NetworkingAI implements Runnable {
      *
      * @return Number of sticks the server has.
      */
-    public synchronized int getSticksRemaining() {
+    public int getSticksRemaining() {
         return sticksRemaining;
     }
 
@@ -91,14 +99,12 @@ public abstract class NetworkingAI implements Runnable {
      * @param numSticks Number of sticks to take.
      * @return If the sticks could be taken.
      */
-    public synchronized boolean takeSticks(int numSticks) {
+    public boolean takeSticks(int numSticks) {
         networkIOManager.write("take stick " + numSticks);
 
         while (replyTakeSticks == null) {
 
         }
-
-        System.out.println("BACK");
 
         if (replyTakeSticks.contains("GOOD")) {
             replyTakeSticks = null;
@@ -115,7 +121,7 @@ public abstract class NetworkingAI implements Runnable {
      *
      * @return If the player has won.
      */
-    public synchronized boolean wonMatch() {
+    public boolean wonMatch() {
         return hasWonMatch;
     }
 
@@ -132,36 +138,49 @@ public abstract class NetworkingAI implements Runnable {
 
     /**
      * Main loop
+     *
+     * @see DO NOT EDIT
      */
     @Override
     public void run() {
-        synchronized (this) {
-            while (true) {
-                try {
-                    waitForMatch();
-                    Thread.sleep(50);
-                    requestMatchData();
-                    Thread.sleep(50);
-                    while (requestIsMatchStillActive()) {
-                        waitForTurn();
-                        Thread.sleep(50);
-                        requestMatchDataUpdate();
-                        Thread.sleep(50);
-                        playGame();
-                    }
-                    requestHasWonMatch();
-                    gameOver();
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(NetworkingAI.class.getName()).log(Level.SEVERE, null, ex);
-                }
+//        synchronized (this) {
+        while (true) {
+            waitForMatch();
+            System.out.println("Joined Match");
+            requestMatchData();
+            while (requestIsMatchStillActive()) {
+                waitForTurn();
+                requestMatchDataUpdate();
+                playGame();
+                halt(10);
             }
+            halt(50);
+            requestHasWonMatch();
+            System.out.println("done");
+            gameOver();
+        }
+//        }
+    }
+
+    /**
+     * Delays the thread for some time.
+     *
+     * @param millis Time to sleep.
+     */
+    private void halt(int millis) {
+        try {
+            sleep(millis);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(NetworkingAI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    private synchronized void waitForTurn() {
+    /**
+     * Waits for the client's turn. The server will tell the client when.
+     */
+    private void waitForTurn() {
 
-        System.out.println("Waiting for turn...");
-
+//        System.out.println("Waiting for turn...");
         synchronized (this) {
             while (!isTurn) {
 
@@ -172,33 +191,41 @@ public abstract class NetworkingAI implements Runnable {
 
     }
 
-    private synchronized void requestHasWonMatch() {
+    /**
+     * Requests the winner of the match from the server.
+     */
+    private void requestHasWonMatch() {
 
-        synchronized (this) {
-            inMatch = false;
-        }
-
-    }
-
-    private synchronized void waitForMatch() {
-
-        synchronized (this) {
-            hasWonMatch = false;
-
-            while (!inMatch) {
-
-            }
-
-            System.out.println("Joined Match!");
-            matchStillActive = true;
-        }
+//        synchronized (this) {
+        inMatch = false;
+        networkIOManager.write("request winner");
+//        }
 
     }
 
-    private synchronized void requestMatchData() {
+    /**
+     * Waits until a match is joined..
+     */
+    private void waitForMatch() {
 
-        System.out.println("Loading game data...");
-        
+//        synchronized (this) {
+        hasWonMatch = false;
+
+        while (!inMatch) {
+
+        }
+        matchStillActive = true;
+//        }
+
+    }
+
+    /**
+     * Requests initial match data.
+     */
+    private void requestMatchData() {
+
+        System.out.println("Getting game data...");
+
 //        synchronized (this) {
         networkIOManager.write("request maxStick");
         networkIOManager.write("request currentSticks");
@@ -206,10 +233,12 @@ public abstract class NetworkingAI implements Runnable {
 
     }
 
-    private synchronized void requestMatchDataUpdate() {
+    /**
+     * Requests updated match data.
+     */
+    private void requestMatchDataUpdate() {
 
-        System.out.println("Requesting game data...");
-        
+//        System.out.println("Requesting game data...");
 //        synchronized (this) {
         networkIOManager.write("request maxStick");
         networkIOManager.write("request currentSticks");
@@ -217,44 +246,62 @@ public abstract class NetworkingAI implements Runnable {
 
     }
 
-    private synchronized boolean requestIsMatchStillActive() {
+    /**
+     * Gets the state of the match.
+     *
+     * @return Match state. (true -> active, false -> inactive)
+     */
+    private boolean requestIsMatchStillActive() {
 
         return matchStillActive;
 
     }
 
-    private synchronized void terminate() {
+    /**
+     * Kills the client.
+     *
+     * @deprecated Not implemented
+     */
+    private void terminate() {
 
         try {
-            socket.close();
+            socketOut.close();
         } catch (IOException ex) {
             Logger.getLogger(NetworkingAI.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
 
+    /**
+     * A class that handles managing network IO.
+     */
     private class NetworkIOManager extends Thread {
 
         private volatile BufferedReader in;
         private volatile PrintWriter out;
 
+        /**
+         * Constructor. Automatically starts listening.
+         *
+         * @throws IOException
+         */
         private NetworkIOManager() throws IOException {
 
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out = new PrintWriter(socket.getOutputStream(), true);
+            in = new BufferedReader(new InputStreamReader(socketIn.getInputStream()));
+            out = new PrintWriter(socketOut.getOutputStream(), true);
 
-//            write("hello");
-//            write("next msh");
-//            write("Y01O");
             this.start();
 
         }
 
+        /**
+         * Listens for input from the server.
+         */
         public void listen() {
             try {
                 String input;
                 if ((input = in.readLine()) != null) {
-                    System.out.println("Recieved " + input + " from the server.");
+//                    System.out.println("Recieved " + input + " from the server.");
                     parseCommand(input);
                 }
             } catch (IOException ex) {
@@ -263,6 +310,9 @@ public abstract class NetworkingAI implements Runnable {
 
         }
 
+        /**
+         * Main loop.
+         */
         @Override
         public void run() {
             while (true) {
@@ -272,6 +322,8 @@ public abstract class NetworkingAI implements Runnable {
         }
 
         /**
+         *
+         * Parses commands sent from the server.
          *
          * @see Possible commands:
          * @see request maxStick
@@ -283,82 +335,87 @@ public abstract class NetworkingAI implements Runnable {
          * @param command
          */
         private void parseCommand(String command) {
-            synchronized (this) {
+//            synchronized (this) {
 
-                if (command.contains("matchStillActive ")) {
-                    if (command.contains("true")) {
-                        matchStillActive = true;
-                    } else {
-                        matchStillActive = false;
-                    }
-                }
-
-                if (command.contains("currentSticks")) {
-                    String number = "";
-                    for (Character c : command.toCharArray()) {
-                        if (Character.isDigit(c)) {
-                            number += c;
-                        }
-                    }
-
-                    int num = Integer.parseInt(number);
-
-                    sticksRemaining = num;
-                }
-
-                if (command.contains("maxStick")) {
-                    String number = "";
-                    for (Character c : command.toCharArray()) {
-                        if (Character.isDigit(c)) {
-                            number += c;
-                        }
-                    }
-
-                    int num = Integer.parseInt(number);
-
-                    maxSticksTaken = num;
-                }
-
-                if (command.contains("terminate")) {
-                    terminate();
-                }
-
-                if (command.contains("inMatch")) {
-                    inMatch = true;
-                }
-
-                if (command.contains("isTurn")) { //Make take boolean?
-                    isTurn = true;
-                }
-
-                if (command.contains("isWinner")) {
-                    if (command.contains("true")) {
-                        hasWonMatch = true;
-                    } else {
-                        hasWonMatch = false;
-                    }
-                }
-
-                if (command.contains("matchStillActive")) {
-                    if (command.contains("true")) {
-                        matchStillActive = true;
-                    } else {
-                        matchStillActive = false;
-                    }
-                }
-
-                if (command.contains("STICK_")) {
-                    if (command.contains("GOOD")) {
-                        replyTakeSticks = "GOOD";
-                    } else {
-                        replyTakeSticks = "BAD";
-                    }
+            if (command.contains("matchStillActive ")) {
+                if (command.contains("true")) {
+                    matchStillActive = true;
+                } else {
+                    matchStillActive = false;
                 }
             }
+
+            if (command.contains("currentSticks")) {
+                String number = "";
+                for (Character c : command.toCharArray()) {
+                    if (Character.isDigit(c)) {
+                        number += c;
+                    }
+                }
+
+                int num = Integer.parseInt(number);
+
+                sticksRemaining = num;
+            }
+
+            if (command.contains("maxStick")) {
+                String number = "";
+                for (Character c : command.toCharArray()) {
+                    if (Character.isDigit(c)) {
+                        number += c;
+                    }
+                }
+
+                int num = Integer.parseInt(number);
+
+                maxSticksTaken = num;
+            }
+
+            if (command.contains("terminate")) {
+                terminate();
+            }
+
+            if (command.contains("inMatch")) {
+                inMatch = true;
+            }
+
+            if (command.contains("isTurn")) { //Make take boolean?
+                isTurn = true;
+            }
+
+            if (command.contains("isWinner")) {
+                if (command.contains("true")) {
+                    hasWonMatch = true;
+                } else {
+                    hasWonMatch = false;
+                }
+            }
+
+            if (command.contains("matchStillActive")) {
+                if (command.contains("true")) {
+                    matchStillActive = true;
+                } else {
+                    matchStillActive = false;
+                }
+            }
+
+            if (command.contains("STICK_")) {
+                if (command.contains("GOOD")) {
+                    replyTakeSticks = "GOOD";
+                } else {
+                    replyTakeSticks = "BAD";
+                }
+            }
+//            }
         }
 
-        public synchronized void write(String message) {
-            System.out.println("Sent " + message + " to the server.");
+        /**
+         * Sends messages to the server.
+         *
+         * @param message Message to be sent.
+         */
+        public void write(String message) {
+//            System.out.println("Sent " + message + " to the server.");
             out.println(message);
         }
 

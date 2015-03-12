@@ -82,8 +82,9 @@ public class Client implements Runnable {
 
     /**
      * Gets the current match being played. Not used...
-     * @deprecated 
-     * @return 
+     *
+     * @deprecated
+     * @return
      */
     public Match getMatch() {
         return match;
@@ -132,7 +133,8 @@ public class Client implements Runnable {
 
     /**
      * Tells the client if the match is still active.
-     * @param isActive 
+     *
+     * @param isActive
      */
     public synchronized void matchStillActive(boolean isActive) {
         clientIO.write("matchStillActive " + isActive);
@@ -149,7 +151,9 @@ public class Client implements Runnable {
     }
 
     /**
-     * Waits for the client to send the data. Once data is sent, it is reported to the server.
+     * Waits for the client to send the data. Once data is sent, it is reported
+     * to the server.
+     *
      * @return The number of sticks taken by the client.
      * @see Error checking handled in the IO handler.
      * @see clearSticksTaken() MUST be run to use this method again.
@@ -183,16 +187,17 @@ public class Client implements Runnable {
     }
 
     /**
-     * Tells the client who the winner is. Also adds statistics to the serverside client.
+     * Tells the client who the winner is. Also adds statistics to the
+     * serverside client.
      */
     public void getWinner() {
         if (match != null && !match.isMatchStillActive()) {
             boolean won = this == match.getWinner();
             clientIO.write("isWinner " + (won));
-            
-            if(won){
+
+            if (won) {
                 wins++;
-            } else{
+            } else {
                 losses++;
             }
         }
@@ -222,6 +227,7 @@ public class Client implements Runnable {
 
     /**
      * Sets the number of sticks taken.
+     *
      * @param num Number of sticks to take.
      */
     public void takeSticks(int num) {
@@ -230,7 +236,8 @@ public class Client implements Runnable {
 
     /**
      * Not used. Original purpose was to kill the client safely.
-     * @deprecated 
+     *
+     * @deprecated
      */
     public void terminate() {
 //        synchronized (this) {
@@ -252,7 +259,8 @@ public class Client implements Runnable {
 
     /**
      * Makes the client object human readable...
-     * @return 
+     *
+     * @return
      */
     public String toString() {
         return "" + id;

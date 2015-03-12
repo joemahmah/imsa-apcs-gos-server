@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 
 /**
  * The programmatical representation of a match.
- * 
+ *
  * @author mhrcek
  */
 public class Match extends Thread {
@@ -31,7 +31,7 @@ public class Match extends Thread {
 
     /**
      * Constructor for a match.
-     * 
+     *
      * @param lobby Lobby the players were taken from.
      * @param totalSticks The total number of sticks to exist.
      * @param maxSticksToTake The maximum number of sticks which may be taken.
@@ -53,16 +53,16 @@ public class Match extends Thread {
 
     /**
      * Tells the client if the match is still active.
-     * 
-     * @return 
+     *
+     * @return
      */
     public boolean isMatchStillActive() {
         return sticksRemaining != 0;
     }
 
-    
     /**
      * The number of sticks remaining.
+     *
      * @return Number of sticks remaining.
      */
     public int getSticksRemaining() {
@@ -71,6 +71,7 @@ public class Match extends Thread {
 
     /**
      * The total number of sticks.
+     *
      * @return Total number of sticks.
      */
     public int getTotalSticks() {
@@ -79,6 +80,7 @@ public class Match extends Thread {
 
     /**
      * The max number of sticks that may be taken per person per round.
+     *
      * @return Max sticks to be taken.
      */
     public int getMaxSticksToTake() {
@@ -87,9 +89,10 @@ public class Match extends Thread {
 
     /**
      * Determines the winner of the match.
+     *
      * @param c Client to check.
      * @return If the client is the winner.
-     * @deprecated 
+     * @deprecated
      */
     public boolean isWinner(Client c) {
         return c == winningClient;
@@ -125,7 +128,7 @@ public class Match extends Thread {
                 }
                 halt(50);
             }
-            
+
             halt(500);
             isOver();
         }
@@ -133,6 +136,7 @@ public class Match extends Thread {
 
     /**
      * Sleeps the thread for some time.
+     *
      * @param millis Time for thread to sleep.
      */
     private void halt(int millis) {
@@ -145,6 +149,7 @@ public class Match extends Thread {
 
     /**
      * Function that gets the sticks. Will notify clients of their turn state.
+     *
      * @param c Sticks to be taken.
      */
     private void takeSticks(Client c) {
@@ -165,6 +170,7 @@ public class Match extends Thread {
 
     /**
      * Tells the client if it is their turn.
+     *
      * @param c The client to be tested.
      * @return If the tested client is in its turn.
      */
@@ -174,6 +180,7 @@ public class Match extends Thread {
 
     /**
      * Sets the winner of the match.
+     *
      * @param c Winner of the match.
      */
     private void winner(Client c) {
@@ -181,12 +188,13 @@ public class Match extends Thread {
         player1.matchStillActive(false);
         player2.matchStillActive(false);
     }
-    
+
     /**
      * Gives the winning client.
+     *
      * @return The winning client.
      */
-    public Client getWinner(){
+    public Client getWinner() {
         return winningClient;
     }
 
@@ -195,8 +203,7 @@ public class Match extends Thread {
     }
 
     /**
-     * @deprecated 
-     * @param c 
+     * @deprecated @param c
      */
     public void terminate(Client c) {
         if (c == player1) {
@@ -207,14 +214,14 @@ public class Match extends Thread {
 
         //kill THIS!!!!
     }
-    
+
     /**
      * Moves the clients back into the lobby.
      */
-    public void isOver(){
+    public void isOver() {
         lobby.addToLobby(player1);
         lobby.addToLobby(player2);
-        
+
     }
 
     /*

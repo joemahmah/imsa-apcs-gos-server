@@ -13,16 +13,17 @@ import java.util.logging.Logger;
 
 /**
  * Logs games.
+ *
  * @author mhrcek
  * @deprecated Not used. Meant to log matches.
  */
 public class Log {
-    
-    public static synchronized void println(String fileName, String message){
+
+    public static synchronized void println(String fileName, String message) {
         PrintStream ps = null;
         try {
             File f = new File(fileName);
-            
+
             ps = new PrintStream(f);
             ps.append(message + "\n");
         } catch (FileNotFoundException ex) {
@@ -31,12 +32,12 @@ public class Log {
             ps.close();
         }
     }
-    
-    public static synchronized void print(String fileName, String message){
+
+    public static synchronized void print(String fileName, String message) {
         PrintStream ps = null;
         try {
             File f = new File(fileName);
-            
+
             ps = new PrintStream(f);
             ps.append(message);
         } catch (FileNotFoundException ex) {
@@ -45,5 +46,5 @@ public class Log {
             ps.close();
         }
     }
-    
+
 }

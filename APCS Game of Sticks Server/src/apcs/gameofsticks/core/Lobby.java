@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 
 /**
  * Holds clients while they are waiting for a match.
- * 
+ *
  * @author mhrcek
  */
 public class Lobby implements Runnable {
@@ -28,7 +28,8 @@ public class Lobby implements Runnable {
 
     /**
      * Add a client to the lobby.
-     * @param client The client to be added. 
+     *
+     * @param client The client to be added.
      */
     public synchronized void addToLobby(Client client) {
         clientsInLobby.add(client);
@@ -36,7 +37,7 @@ public class Lobby implements Runnable {
 
     /**
      * Removes a client from the lobby.
-     * 
+     *
      * @param client Client to be removed.
      * @return The client which was removed from the lobby.
      * @throws Exception Client not in lobby.
@@ -54,7 +55,7 @@ public class Lobby implements Runnable {
 
     /**
      * Determines all clients which are flagged as ready for a match.
-     * 
+     *
      * @return Clients ready for a match.
      */
     public synchronized List<Client> getClientsFlaggedAsReady() {
@@ -72,6 +73,7 @@ public class Lobby implements Runnable {
 
     /**
      * Remove clients from the lobby.
+     *
      * @param clients List of clients to be removed.
      */
     public void removeClients(List clients) {
@@ -82,6 +84,7 @@ public class Lobby implements Runnable {
 
     /**
      * Add clients to the lobby.
+     *
      * @param clients List of clients to be added.
      */
     public void addClients(List clients) {
@@ -96,11 +99,11 @@ public class Lobby implements Runnable {
     @Override
     public void run() {
 
-        while(true){
+        while (true) {
             try {
 //                System.out.println(clientsInLobby.size());
-                for(Client c: clientsInLobby){
-                    if(c.getSocketOut().isClosed()){
+                for (Client c : clientsInLobby) {
+                    if (c.getSocketOut().isClosed()) {
                         clientsInLobby.remove(c);
                     }
                 }
@@ -109,7 +112,7 @@ public class Lobby implements Runnable {
                 Logger.getLogger(Lobby.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
+
     }
 
 }

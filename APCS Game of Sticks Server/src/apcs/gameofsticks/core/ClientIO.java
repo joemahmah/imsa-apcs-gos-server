@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 
 /**
  * Handles IO for the client.
- * 
+ *
  * @author mhrcek
  */
 public class ClientIO extends Thread {
@@ -26,9 +26,9 @@ public class ClientIO extends Thread {
 
     /**
      * Client IO handler.
-     * 
+     *
      * @param client Client associated with the handler.
-     * @throws IOException 
+     * @throws IOException
      */
     public ClientIO(Client client) throws IOException {
         this.client = client;
@@ -44,22 +44,22 @@ public class ClientIO extends Thread {
      */
     public synchronized void listen() {
 //        synchronized (this) {
-            try {
-                String input;
-                if ((input = in.readLine()) != null) {
-                    parseCommand(input);
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(ClientIO.class.getName()).log(Level.SEVERE, null, ex);
+        try {
+            String input;
+            if ((input = in.readLine()) != null) {
+                parseCommand(input);
             }
+        } catch (IOException ex) {
+            Logger.getLogger(ClientIO.class.getName()).log(Level.SEVERE, null, ex);
+        }
 //        }
     }
 
     @Override
     public void run() {
 //        synchronized (this) {
-            while (true) {
-                listen();
+        while (true) {
+            listen();
 //            }
         }
     }
@@ -81,7 +81,7 @@ public class ClientIO extends Thread {
         synchronized (this) {
 
             System.out.println("Message " + command + " recieved from client " + client + ".");
-            
+
             if (command.contains("request maxStick")) {
                 client.getMaxSticks();
             }
@@ -111,7 +111,7 @@ public class ClientIO extends Thread {
                 }
 
                 int num = Integer.parseInt(number);
-                
+
                 if (num > 0 && num <= client.getMatch().getMaxSticksToTake()) {
                     client.takeSticks(num);
                     write("STICK_GOOD");
@@ -124,6 +124,7 @@ public class ClientIO extends Thread {
 
     /**
      * Writes the message to the client.
+     *
      * @param message Message to be written.
      */
     public void write(String message) {
